@@ -20,11 +20,12 @@ while True:
     # Detect humans
     boxes, weights = hog.detectMultiScale(frame, winStride=(8, 8))
 
-    threat_label = "None"
+    threat_label = "NONE"
     threat_level = "LOW"
-    confidence = 0
+    threat_score = 0.0
+    confidence = 0.0
 
-    # Simulate distance (sensor input)
+    # Simulated sensor distance
     distance = random.randint(20, 150)
 
     for i, (x, y, w, h) in enumerate(boxes):
@@ -35,28 +36,32 @@ while True:
 
         threat_label = "person"
 
-        # Calculate threat level
-        threat_level = calculate_threat(threat_label, confidence, distance)
+        # Calculate threat
+        threat_level, threat_score = calculate_threat(
+            threat_label, confidence, distance
+        )
 
-        # Show label near box
-        label_text = f"{threat_label.upper()} ({confidence})"
-        cv2.putText(frame, label_text, (x, y-10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+        # Label near box
+        cv2.putText(frame, f"{threat_label.upper()} ({confidence})",
+                    (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,0), 2)
 
-    # Display system info
+    # UI display
     cv2.putText(frame, f"Threat: {threat_label.upper()}",
-                (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+                (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,255), 2)
 
     cv2.putText(frame, f"Level: {threat_level}",
-                (20, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                (20, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
+
+    cv2.putText(frame, f"Score: {threat_score}",
+                (20, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,255), 2)
 
     cv2.putText(frame, f"Distance: {distance} cm",
-                (20, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
+                (20, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255,255,0), 2)
 
-    # Alert system (simple)
+    # Alert
     if threat_level == "HIGH":
-        cv2.putText(frame, "🚨 ALERT 🚨",
-                    (200, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 3)
+        cv2.putText(frame, "🚨 HIGH ALERT 🚨",
+                    (180, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 3)
 
     # Show window
     cv2.imshow("SENTINEL-X Surveillance", frame)
@@ -65,6 +70,6 @@ while True:
     if cv2.waitKey(1) == 27:
         break
 
-# Release resources
+# Cleanup
 cap.release()
 cv2.destroyAllWindows()
