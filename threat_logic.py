@@ -1,10 +1,12 @@
 def calculate_threat(label, confidence, distance):
+    # Base threat weights
     weights = {
         "person": 0.6,
         "drone": 0.9,
         "animal": 0.2
     }
 
+    # Distance factor
     if distance < 50:
         dist_factor = 1.0
     elif distance < 100:
@@ -12,11 +14,18 @@ def calculate_threat(label, confidence, distance):
     else:
         dist_factor = 0.4
 
-    score = weights.get(label, 0.3) * confidence * dist_factor
+    # Get base weight
+    base_weight = weights.get(label, 0.3)
 
+    # Calculate threat score
+    score = round(base_weight * confidence * dist_factor, 2)
+
+    # Assign threat level
     if score > 0.7:
-        return "HIGH"
+        level = "HIGH"
     elif score > 0.4:
-        return "MEDIUM"
+        level = "MEDIUM"
     else:
-        return "LOW"
+        level = "LOW"
+
+    return level, score
